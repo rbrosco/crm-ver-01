@@ -304,31 +304,29 @@ export const ClientList: React.FC<ClientListProps> = ({
     return (
       <th 
         key={fieldKey}
-        // Increased font size from text-xs to text-sm
-        className={`px-2 py-1 text-left align-top bg-zinc-900 border-b border-zinc-800 relative select-none whitespace-nowrap ${visibilityClass}`}
+        className={`px-1.5 py-0.5 text-left align-top bg-zinc-900 border-b border-zinc-800 relative select-none whitespace-nowrap ${visibilityClass}`}
         style={style}
       >
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <div 
-            className="flex items-center gap-1 cursor-pointer group"
+            className="flex items-center gap-0.5 cursor-pointer group"
             onClick={() => handleSort(fieldKey as keyof Client)}
           >
-            {/* Font bump for Header Label */}
-            <span className="text-sm font-bold text-zinc-400 uppercase tracking-wider group-hover:text-primary-400 transition-colors whitespace-nowrap">
+            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider group-hover:text-primary-400 transition-colors whitespace-nowrap">
               {label}
             </span>
             <div className="text-zinc-600 group-hover:text-primary-500">
               {sortConfig?.key === fieldKey ? (
-                sortConfig.direction === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />
+                sortConfig.direction === 'asc' ? <ChevronUp size={12} /> : <ChevronDown size={12} />
               ) : (
-                <Filter size={12} className="opacity-0 group-hover:opacity-50" />
+                <Filter size={10} className="opacity-0 group-hover:opacity-50" />
               )}
             </div>
           </div>
           <div onClick={(e) => e.stopPropagation()}> 
             {isSelect ? (
               <select
-                className="w-full bg-zinc-950 border border-zinc-700 text-zinc-200 text-xs rounded px-1.5 py-1 focus:outline-none focus:border-primary-500 appearance-none cursor-pointer"
+                className="w-full bg-zinc-950 border border-zinc-700 text-zinc-200 text-xs rounded px-1 py-0.5 focus:outline-none focus:border-primary-500 appearance-none cursor-pointer"
                 value={filters[fieldKey as keyof Client] || 'todos'}
                 onChange={(e) => handleFilterChange(fieldKey as keyof Client, e.target.value)}
               >
@@ -342,7 +340,7 @@ export const ClientList: React.FC<ClientListProps> = ({
                 type="text"
                 autoComplete="off"
                 placeholder="Filtrar..."
-                className="w-full bg-zinc-950 border border-zinc-700 text-zinc-200 text-xs rounded px-1.5 py-1 focus:outline-none focus:border-primary-500 placeholder-zinc-600"
+                className="w-full bg-zinc-950 border border-zinc-700 text-zinc-200 text-xs rounded px-1 py-0.5 focus:outline-none focus:border-primary-500 placeholder-zinc-600"
                 value={filters[fieldKey as keyof Client] || ''}
                 onChange={(e) => handleFilterChange(fieldKey as keyof Client, e.target.value)}
               />
@@ -408,7 +406,7 @@ export const ClientList: React.FC<ClientListProps> = ({
 
       {/* Content Area - RESPONSIVE TABLE FOR ALL DEVICES */}
       <div className="flex-1 bg-zinc-950/30 overflow-y-auto overflow-x-auto custom-scrollbar w-full max-h-[calc(100vh-250px)] relative">
-         <table className="w-full text-left border-collapse">
+         <table className="w-full text-left border-collapse text-sm">
            <thead className="sticky top-0 z-20 shadow-md shadow-black/20">
              <tr>
                {renderHeader("Nome Completo", "fullName")}
@@ -418,7 +416,7 @@ export const ClientList: React.FC<ClientListProps> = ({
                {renderHeader("Data Início", "entryDate", false, true)} {/* Hide on Mobile */}
                {renderHeader("Duração", "subscriptionDays", false, true)} {/* Hide on Mobile */}
                {renderHeader("Status", "isPaid", true)}
-               <th className="px-2 py-1 bg-zinc-900 border-b border-zinc-800 w-[80px]">Ações</th>
+               <th className="px-1.5 py-0.5 bg-zinc-900 border-b border-zinc-800 w-[70px] text-xs">Ações</th>
              </tr>
            </thead>
            <tbody>
@@ -429,39 +427,38 @@ export const ClientList: React.FC<ClientListProps> = ({
                  const cleanPhone = client.phone ? client.phone.replace(/\D/g, '') : '';
                  return (
                   <tr key={client.id} className="hover:bg-zinc-800/30 transition-colors group">
-                      {/* Bumped to text-base for better visibility */}
-                      <td className="px-2 py-1 border-b border-zinc-800/50 text-zinc-100 font-medium text-base whitespace-nowrap">
+                      <td className="px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-100 font-medium text-sm whitespace-nowrap">
                         {client.fullName}
                       </td>
-                      <td className="px-2 py-1 border-b border-zinc-800/50 text-zinc-300 text-base whitespace-nowrap">
+                      <td className="px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-300 text-sm whitespace-nowrap">
                          {cleanPhone ? (
-                           <a href={`https://wa.me/${cleanPhone}`} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 flex items-center gap-1 transition-colors">
-                              <Phone size={14} />
+                           <a href={`https://wa.me/${cleanPhone}`} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 flex items-center gap-0.5 transition-colors">
+                              <Phone size={12} />
                               {client.phone}
                            </a>
                          ) : (
                             client.phone || '-'
                          )}
                       </td>
-                      <td className="hidden md:table-cell px-2 py-1 border-b border-zinc-800/50 text-zinc-400 text-base whitespace-nowrap">
-                        <span className="flex items-center gap-2">
-                          <Globe size={14} className="text-zinc-600" />
+                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-400 text-xs whitespace-nowrap">
+                        <span className="flex items-center gap-1">
+                          <Globe size={12} className="text-zinc-600" />
                           {client.country}
                         </span>
                       </td>
-                      <td className="hidden md:table-cell px-2 py-1 border-b border-zinc-800/50 whitespace-nowrap">
-                        <span className="font-mono text-sm bg-zinc-900 border border-zinc-800 px-2 py-1 rounded text-zinc-400 select-all">
+                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-800/50 whitespace-nowrap">
+                        <span className="font-mono text-xs bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded text-zinc-400 select-all">
                             {client.macAddress || '---'}
                         </span>
                       </td>
-                      <td className="hidden md:table-cell px-2 py-1 border-b border-zinc-800/50 text-zinc-400 text-base whitespace-nowrap">
+                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-400 text-xs whitespace-nowrap">
                          {new Date(client.entryDate).toLocaleDateString('pt-BR')}
                       </td>
-                      <td className="hidden md:table-cell px-2 py-1 border-b border-zinc-800/50 text-zinc-400 text-base whitespace-nowrap">
+                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-400 text-xs whitespace-nowrap">
                          {client.subscriptionDays} dias
                       </td>
-                      <td className="px-2 py-1 border-b border-zinc-800/50 whitespace-nowrap">
-                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-bold border uppercase tracking-wide ${
+                      <td className="px-1.5 py-0.5 border-b border-zinc-800/50 whitespace-nowrap">
+                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wide ${
                             client.subscriptionDays <= 0
                               ? 'bg-red-500/10 text-red-400 border-red-500/20'
                               : client.isPaid 
@@ -471,21 +468,21 @@ export const ClientList: React.FC<ClientListProps> = ({
                             {client.subscriptionDays <= 0 ? 'Não Ativo' : client.isPaid ? 'Ativo' : 'Pendente'}
                          </span>
                       </td>
-                      <td className="px-2 py-1 border-b border-zinc-800/50 sticky right-0 bg-zinc-950/80 backdrop-blur-sm group-hover:bg-zinc-900/80 transition-colors z-10 whitespace-nowrap">
-                         <div className="flex gap-2">
+                      <td className="px-1.5 py-0.5 border-b border-zinc-800/50 sticky right-0 bg-zinc-950/80 backdrop-blur-sm group-hover:bg-zinc-900/80 transition-colors z-10 whitespace-nowrap">
+                         <div className="flex gap-1">
                             <button 
                               onClick={() => onEdit(client)}
-                              className="p-1.5 text-zinc-500 hover:text-primary-400 hover:bg-zinc-800 rounded-lg transition-colors"
+                              className="p-1 text-zinc-500 hover:text-primary-400 hover:bg-zinc-800 rounded transition-colors"
                               title="Editar"
                             >
-                              <Edit size={16} />
+                              <Edit size={14} />
                             </button>
                             <button 
                               onClick={() => onDelete(client.id)}
-                              className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-zinc-800 rounded-lg transition-colors"
+                              className="p-1 text-zinc-500 hover:text-red-400 hover:bg-zinc-800 rounded transition-colors"
                               title="Excluir"
                             >
-                              <Trash2 size={16} />
+                              <Trash2 size={14} />
                             </button>
                          </div>
                       </td>
