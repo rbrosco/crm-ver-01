@@ -9,6 +9,7 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
     "migrate": "prisma migrate dev",
     "migrate:data": "tsx server/migrate.ts",
+    "seed": "tsx server/seed.ts",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
     "build": "vite build",
