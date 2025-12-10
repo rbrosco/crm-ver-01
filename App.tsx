@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { LayoutGrid, AlertTriangle, LogOut, Timer, Calendar, Ban } from 'lucide-react';
+import Logo from './components/LogoTrek';
 import { Client } from './types';
 import { StatCard } from './components/StatCard';
 import { ClientForm } from './components/ClientForm';
 import { ClientList } from './components/ClientList';
 import { Login } from './components/Login';
+import { clientsAPI } from './src/api';
 
 type FilterType = 'all' | '10' | '30' | 'pending';
 
@@ -14,16 +16,7 @@ const App: React.FC = () => {
     return localStorage.getItem('crm_auth') === 'true';
   });
 
-  // Initialize clients from localStorage if available
-  const [clients, setClients] = useState<Client[]>(() => {
-    try {
-      const saved = localStorage.getItem('crm_clients');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.error("Failed to load from local storage", e);
-      return [];
-    }
-  });
+  const [clients, setClients] = useState<Client[]>([]);
   
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -31,10 +24,25 @@ const App: React.FC = () => {
   // Filter State
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
-  // Save to localStorage whenever clients change
+  // Note: clients are persisted only on the server (no localStorage)
+
+  // Fetch clients from API when authenticated
   useEffect(() => {
-    localStorage.setItem('crm_clients', JSON.stringify(clients));
-  }, [clients]);
+    const load = async () => {
+      if (!isAuthenticated) return;
+      try {
+        const data = await clientsAPI.getAll();
+        if (Array.isArray(data)) {
+          setClients(data);
+        }
+      } catch (err) {
+        console.error('Não foi possível carregar clientes do servidor:', err);
+        // Leave clients empty — application relies on server as source of truth
+        setClients([]);
+      }
+    };
+    load();
+  }, [isAuthenticated]);
 
   const handleLogin = (status: boolean) => {
     setIsAuthenticated(status);
@@ -49,18 +57,57 @@ const App: React.FC = () => {
   };
 
   const addClient = (newClient: Client) => {
-    setClients((prev) => [newClient, ...prev]);
+    // Persist to backend then update state with returned client
+    (async () => {
+      try {
+        const payload = { ...newClient } as any;
+        delete payload.id;
+        const created = await clientsAPI.create(payload);
+        setClients((prev) => [created, ...prev]);
+      } catch (err) {
+        console.error('Erro ao criar cliente:', err);
+        alert('Erro ao salvar cliente no servidor. Verifique a conexão.');
+      }
+    })();
   };
 
   const updateClient = (updatedClient: Client) => {
-    setClients((prev) => prev.map(c => c.id === updatedClient.id ? updatedClient : c));
-    setClientToEdit(null); // Clear edit mode
+    (async () => {
+      try {
+        const id = updatedClient.id;
+        const payload = { ...updatedClient } as any;
+        delete payload.id;
+        const updated = await clientsAPI.update(id, payload);
+        setClients((prev) => prev.map(c => c.id === updated.id ? updated : c));
+        setClientToEdit(null);
+      } catch (err) {
+        console.error('Erro ao atualizar cliente:', err);
+        alert('Erro ao atualizar cliente no servidor.');
+      }
+    })();
   };
 
   // Handle importing clients from CSV
   const handleImportClients = (importedClients: Client[]) => {
-    setClients((prev) => [...importedClients, ...prev]);
-    alert(`${importedClients.length} clientes importados com sucesso!`);
+    (async () => {
+      try {
+        await clientsAPI.import(importedClients.map(c => ({
+          fullName: c.fullName,
+          phone: c.phone,
+          country: c.country,
+          macAddress: c.macAddress,
+          entryDate: c.entryDate,
+          subscriptionDays: c.subscriptionDays,
+          isPaid: c.isPaid
+        })));
+        const refreshed = await clientsAPI.getAll();
+        setClients(refreshed);
+        alert(`${importedClients.length} clientes importados com sucesso!`);
+      } catch (err) {
+        console.error('Erro ao importar:', err);
+        alert('Erro ao importar clientes.');
+      }
+    })();
   };
 
   const requestDelete = (id: string) => {
@@ -69,13 +116,18 @@ const App: React.FC = () => {
 
   const confirmDelete = () => {
     if (deleteId) {
-      setClients((prev) => prev.filter(c => c.id !== deleteId));
-      
-      // If the deleted client was being edited, clear the form
-      if (clientToEdit?.id === deleteId) {
-        setClientToEdit(null);
-      }
-      setDeleteId(null);
+      (async () => {
+        try {
+          await clientsAPI.delete(deleteId);
+          setClients((prev) => prev.filter(c => c.id !== deleteId));
+          if (clientToEdit?.id === deleteId) setClientToEdit(null);
+        } catch (err) {
+          console.error('Erro ao excluir cliente:', err);
+          alert('Erro ao excluir cliente no servidor.');
+        } finally {
+          setDeleteId(null);
+        }
+      })();
     }
   };
 
@@ -150,8 +202,8 @@ const App: React.FC = () => {
       <header className="shrink-0 z-40 bg-zinc-900/90 backdrop-blur-md border-b border-zinc-800 shadow-xl shadow-black/30 sticky top-0">
         <div className="max-w-[1920px] xl:min-w-[1440px] mx-auto px-4 sm:px-10 lg:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-primary-600/20 p-2 rounded-xl text-primary-500 border border-primary-500/20">
-              <LayoutGrid size={24} />
+            <div className="bg-primary-600/10 p-1 rounded-xl text-primary-500 border border-primary-500/10 flex items-center justify-center">
+              <Logo className="w-9 h-9" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-zinc-100 tracking-tight">

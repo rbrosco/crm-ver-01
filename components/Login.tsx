@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LayoutGrid, Lock, User, ArrowRight } from 'lucide-react';
+import { authAPI } from '../src/api';
 
 interface LoginProps {
   onLogin: (status: boolean) => void;
@@ -9,15 +10,27 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple hardcoded validation for demonstration
-    // User can customize this logic later
-    if (username === 'admin' && password === 'admin') {
-      onLogin(true);
-    } else {
-      setError('Credenciais inválidas. Tente admin/admin');
+    setError('');
+    setLoading(true);
+    try {
+      const data = await authAPI.login(username, password);
+      const token = data?.token || data?.data?.token;
+      if (token) {
+        localStorage.setItem('crm_token', token);
+        localStorage.setItem('crm_auth', 'true');
+        onLogin(true);
+      } else {
+        setError('Resposta inválida do servidor');
+      }
+    } catch (err: any) {
+      console.error('Login failed', err);
+      setError(err?.response?.data?.message || 'Credenciais inválidas. Tente admin/admin');
+    } finally {
+      setLoading(false);
     }
   };
 

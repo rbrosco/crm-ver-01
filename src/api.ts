@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001/api';
+// Force using relative URL for API in production
+const API_BASE_URL = '/api';
 
 // Get token from localStorage
 const getToken = () => localStorage.getItem('crm_token');

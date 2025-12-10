@@ -1,7 +1,7 @@
 import { pgTable, text, integer, boolean, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('User', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().defaultRandom(),  // Default value using UUID (will use the default in the DB)
   username: text('username').notNull().unique(),
   password: text('password').notNull(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
@@ -9,7 +9,7 @@ export const users = pgTable('User', {
 });
 
 export const clients = pgTable('Client', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().defaultRandom(),  // Same here, using defaultRandom for UUID
   fullName: text('fullName').notNull(),
   phone: text('phone').notNull(),
   country: text('country').notNull(),
