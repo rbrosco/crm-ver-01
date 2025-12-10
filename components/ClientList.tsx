@@ -407,7 +407,7 @@ export const ClientList: React.FC<ClientListProps> = ({
       </div>
 
       {/* Content Area - RESPONSIVE TABLE FOR ALL DEVICES */}
-      <div className="flex-1 bg-zinc-950/30 overflow-auto custom-scrollbar w-full h-full relative">
+      <div className="flex-1 bg-zinc-950/30 overflow-y-auto overflow-x-auto custom-scrollbar w-full max-h-[calc(100vh-250px)] relative">
          <table className="w-full text-left border-collapse">
            <thead className="sticky top-0 z-20 shadow-md shadow-black/20">
              <tr>

@@ -71,6 +71,24 @@
         background: #52525b; /* Zinc 600 */
       }
 
+      /* Custom scrollbar for table areas - more visible */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #18181b;
+        border-radius: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #52525b;
+        border-radius: 6px;
+        border: 3px solid #18181b;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #71717a;
+      }
+
       /* SCALING LOGIC FOR DESKTOP */
       @media (min-width: 1280px) {
         html {
