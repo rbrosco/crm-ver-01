@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { LayoutGrid, AlertTriangle, LogOut, Timer, Calendar, Ban, Sparkles } from 'lucide-react';
+import { LayoutGrid, AlertTriangle, LogOut, Timer, Calendar, Ban } from 'lucide-react';
 import { Client } from './types';
 import { StatCard } from './components/StatCard';
 import { ClientForm } from './components/ClientForm';
 import { ClientList } from './components/ClientList';
 import { Login } from './components/Login';
-import { AIAnalystModal } from './components/AIAnalystModal';
 
 type FilterType = 'all' | '10' | '30' | 'pending';
 
@@ -28,7 +27,6 @@ const App: React.FC = () => {
   
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   
   // Filter State
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
@@ -163,15 +161,6 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            {/* AI Analyst Button */}
-            <button
-              onClick={() => setIsAIModalOpen(true)}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-indigo-600/10 text-indigo-400 border border-indigo-500/30 rounded-xl hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all shadow-[0_0_15px_rgba(99,102,241,0.15)] hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"
-            >
-              <Sparkles size={18} />
-              <span className="text-sm font-bold">Analista IA</span>
-            </button>
-
             <div className="hidden sm:flex items-center gap-3 px-4 py-1.5 bg-zinc-800/50 rounded-full border border-zinc-700/50">
               <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.6)]"></span>
               <span className="text-sm font-semibold text-zinc-400">Sistema Online</span>
@@ -246,13 +235,6 @@ const App: React.FC = () => {
           </div>
         </div>
       </main>
-
-      {/* AI Analyst Modal */}
-      <AIAnalystModal 
-        isOpen={isAIModalOpen} 
-        onClose={() => setIsAIModalOpen(false)} 
-        clients={clients} 
-      />
 
       {/* Delete Confirmation Modal */}
       {deleteId && (
