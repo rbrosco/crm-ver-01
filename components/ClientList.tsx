@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
-import { Search, Upload, Download, Trash2, Edit, ChevronUp, ChevronDown, Filter, Wand2, Phone, Calendar, Globe, Wifi, X } from 'lucide-react';
+import { Search, Upload, Download, Trash2, Edit, ChevronUp, ChevronDown, Filter, Phone, Calendar, Globe, Wifi, X } from 'lucide-react';
 import { Client } from '../types';
 
 interface ClientListProps {
@@ -264,38 +264,6 @@ export const ClientList: React.FC<ClientListProps> = ({
     }
   };
 
-  // --- MOCK DATA GENERATION ---
-  const handleGenerateRandomData = () => {
-    const firstNames = ["Carlos", "Ana", "Marcos", "Julia", "Pedro", "Mariana", "Roberto", "Fernanda", "Lucas", "Beatriz"];
-    const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Almeida", "Pereira", "Lima", "Gomes"];
-    const countries = ["Brasil", "Portugal", "Espanha", "Estados Unidos", "Argentina", "Japão", "Alemanha"];
-    
-    const randomHex = () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase();
-    const generateMac = () => Array(6).fill(0).map(randomHex).join(':');
-
-    const newMockClients: Client[] = [];
-
-    for (let i = 0; i < 10; i++) {
-      const fn = firstNames[Math.floor(Math.random() * firstNames.length)];
-      const ln = lastNames[Math.floor(Math.random() * lastNames.length)];
-      const country = countries[Math.floor(Math.random() * countries.length)];
-      const phone = `119${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
-      
-      newMockClients.push({
-        id: crypto.randomUUID(),
-        fullName: `${fn} ${ln}`,
-        phone: phone,
-        country: country,
-        macAddress: generateMac(),
-        entryDate: new Date().toISOString().split('T')[0],
-        subscriptionDays: [30, 60, 90, 365][Math.floor(Math.random() * 4)],
-        isPaid: Math.random() > 0.5
-      });
-    }
-
-    onImport(newMockClients);
-  };
-
   const renderHeader = (label: string, fieldKey: string, isSelect: boolean = false, hideOnMobile: boolean = false) => {
     const style = fieldKey === 'fullName' ? {} : { width: columnWidths[fieldKey] };
     // Responsive Visibility Class
@@ -391,9 +359,6 @@ export const ClientList: React.FC<ClientListProps> = ({
             />
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-             <button onClick={handleGenerateRandomData} className="flex-1 sm:flex-none p-3 text-zinc-400 border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:text-primary-500 rounded-xl transition-colors" title="Gerar 10 registros de teste">
-              <Wand2 size={20} />
-            </button>
             <button onClick={handleImportClick} className="flex-1 sm:flex-none p-3 text-zinc-400 border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:text-white rounded-xl transition-colors">
               <Upload size={20} />
             </button>
