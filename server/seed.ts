@@ -1,18 +1,7 @@
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
+import { db } from './db';
+import { users, clients } from './schema';
 import bcrypt from 'bcrypt';
-
-const pool = new pg.Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
-
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 
 async function seed() {
   console.log('🌱 Iniciando seed do banco de dados...\n');
@@ -21,14 +10,10 @@ async function seed() {
     // Create admin user
     const hashedPassword = await bcrypt.hash('admin', 10);
     
-    const user = await prisma.user.upsert({
-      where: { username: 'admin' },
-      update: {},
-      create: {
-        username: 'admin',
-        password: hashedPassword,
-      },
-    });
+    await db.insert(users).values({
+      username: 'admin',
+      password: hashedPassword,
+    }).onConflictDoNothing();
 
     console.log('✅ Usuário admin criado/atualizado:');
     console.log('   Username: admin');
@@ -65,12 +50,9 @@ async function seed() {
       },
     ];
 
-    const clientResult = await prisma.client.createMany({
-      data: sampleClients,
-      skipDuplicates: true,
-    });
+    await db.insert(clients).values(sampleClients).onConflictDoNothing();
 
-    console.log(`✅ ${clientResult.count} clientes de exemplo criados\n`);
+    console.log(`✅ ${sampleClients.length} clientes de exemplo criados\n`);
     console.log('🎉 Seed concluído com sucesso!');
     console.log('\n🚀 Você pode fazer login com:');
     console.log('   Username: admin');
@@ -80,7 +62,7 @@ async function seed() {
     console.error('❌ Erro durante o seed:', error);
     throw error;
   } finally {
-    await prisma.$disconnect();
+    process.exit(0);
   }
 }
 
