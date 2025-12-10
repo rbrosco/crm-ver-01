@@ -148,43 +148,43 @@ const App: React.FC = () => {
       
       {/* Header */}
       <header className="shrink-0 z-40 bg-zinc-900/90 backdrop-blur-md border-b border-zinc-800 shadow-xl shadow-black/30 sticky top-0">
-        <div className="max-w-[1920px] xl:min-w-[1440px] mx-auto px-4 sm:px-10 lg:px-12 h-20 flex items-center justify-between">
+        <div className="max-w-[1920px] xl:min-w-[1440px] mx-auto px-4 sm:px-10 lg:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-primary-600/20 p-2.5 rounded-xl text-primary-500 border border-primary-500/20">
-              <LayoutGrid size={28} />
+            <div className="bg-primary-600/20 p-2 rounded-xl text-primary-500 border border-primary-500/20">
+              <LayoutGrid size={24} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-zinc-100 tracking-tight">
+              <h1 className="text-xl font-bold text-zinc-100 tracking-tight">
                 CRM<span className="text-primary-500">Pro</span>
               </h1>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-3 px-4 py-1.5 bg-zinc-800/50 rounded-full border border-zinc-700/50">
-              <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.6)]"></span>
-              <span className="text-sm font-semibold text-zinc-400">Sistema Online</span>
+            <div className="hidden sm:flex items-center gap-3 px-3 py-1 bg-zinc-800/50 rounded-full border border-zinc-700/50">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.6)]"></span>
+              <span className="text-xs font-semibold text-zinc-400">Sistema Online</span>
             </div>
             <button 
               onClick={handleLogout}
-              className="p-2.5 text-zinc-400 hover:text-red-400 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700"
+              className="p-2 text-zinc-400 hover:text-red-400 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700"
               title="Sair"
             >
-              <LogOut size={22} />
+              <LogOut size={20} />
             </button>
           </div>
         </div>
       </header>
 
       {/* Content Wrapper - Applied Width Constraints */}
-      <main className="flex-1 flex flex-col min-h-0 max-w-[1920px] xl:min-w-[1440px] w-full mx-auto px-4 sm:px-10 lg:px-12 mt-6 sm:mt-8 animate-fadeIn mb-8">
+      <main className="flex-1 flex flex-col min-h-0 max-w-[1920px] xl:min-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 mt-3 sm:mt-4 animate-fadeIn mb-4">
         
         {/* Stats Row - Clickable for Filtering */}
-        <div className="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
           <StatCard 
             title="Vencimento (10 Dias)" 
             value={stats.expiringIn10} 
-            icon={<Timer size={36} className="text-rose-500" />} 
+            icon={<Timer size={28} className="text-rose-500" />} 
             iconColor="bg-rose-500/10 text-rose-500 border-rose-500/20"
             onClick={() => toggleFilter('10')}
             isActive={activeFilter === '10'}
@@ -192,7 +192,7 @@ const App: React.FC = () => {
           <StatCard 
             title="Vencimento (30 Dias)" 
             value={stats.expiringIn30} 
-            icon={<Calendar size={36} className="text-amber-500" />} 
+            icon={<Calendar size={28} className="text-amber-500" />} 
             iconColor="bg-amber-500/10 text-amber-500 border-amber-500/20"
             onClick={() => toggleFilter('30')}
             isActive={activeFilter === '30'}
@@ -200,7 +200,7 @@ const App: React.FC = () => {
           <StatCard 
             title="Pendentes / Não Pagos" 
             value={stats.totalPending} 
-            icon={<Ban size={36} className="text-red-500" />} 
+            icon={<Ban size={28} className="text-red-500" />} 
             iconColor="bg-red-500/10 text-red-500 border-red-500/20"
             onClick={() => toggleFilter('pending')}
             isActive={activeFilter === 'pending'}
@@ -208,7 +208,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Columns (Form + List) */}
-        <div className="flex-1 grid grid-cols-1 xl:grid-cols-12 gap-8 pb-6">
+        <div className="flex-1 grid grid-cols-1 xl:grid-cols-12 gap-4 pb-2 min-h-0">
           
           {/* Left Panel - Form 
               UPDATED: xl:col-span-3 (was 4) to make it narrower (approx 350px on standard desktop) */}

@@ -329,11 +329,11 @@ export const ClientList: React.FC<ClientListProps> = ({
       <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".csv" className="hidden" />
 
       {/* Header Bar */}
-      <div className="p-4 md:p-6 border-b border-zinc-800 flex flex-col xl:flex-row justify-between items-center gap-6 bg-zinc-900 shrink-0">
-        <div className="flex items-center gap-4 w-full xl:w-auto justify-between xl:justify-start">
-          <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-bold text-zinc-100 tracking-tight">Clientes</h2>
-            <span className="bg-zinc-800 text-zinc-400 text-base font-bold px-4 py-1 rounded-full border border-zinc-700">{processedClients.length}</span>
+      <div className="p-2 md:p-3 border-b border-zinc-800 flex flex-col xl:flex-row justify-between items-center gap-3 bg-zinc-900 shrink-0">
+        <div className="flex items-center gap-3 w-full xl:w-auto justify-between xl:justify-start">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-bold text-zinc-100 tracking-tight">Clientes</h2>
+            <span className="bg-zinc-800 text-zinc-400 text-sm font-bold px-3 py-0.5 rounded-full border border-zinc-700">{processedClients.length}</span>
             
             {activeFilter && activeFilter !== 'all' && (
               <div className="flex items-center gap-2 bg-primary-600/20 border border-primary-500/30 text-primary-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider animate-fadeIn">
@@ -346,31 +346,31 @@ export const ClientList: React.FC<ClientListProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full xl:w-auto">
           <div className="relative w-full sm:flex-1 xl:flex-initial group">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 group-focus-within:text-primary-500 transition-colors" size={20} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 group-focus-within:text-primary-500 transition-colors" size={16} />
             <input 
               type="search" 
               autoComplete="off"
               placeholder="Pesquisar..." 
-              className="w-full xl:w-80 bg-zinc-950 border border-zinc-700 text-zinc-100 text-base rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all placeholder-zinc-600 shadow-inner"
+              className="w-full xl:w-64 bg-zinc-950 border border-zinc-700 text-zinc-100 text-sm rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all placeholder-zinc-600 shadow-inner"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-            <button onClick={handleImportClick} className="flex-1 sm:flex-none p-3 text-zinc-400 border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:text-white rounded-xl transition-colors">
-              <Upload size={20} />
+            <button onClick={handleImportClick} className="flex-1 sm:flex-none p-2 text-zinc-400 border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors">
+              <Upload size={18} />
             </button>
-            <button onClick={handleExport} className="flex-1 sm:flex-none p-3 text-zinc-400 border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:text-white rounded-xl transition-colors">
-              <Download size={20} />
+            <button onClick={handleExport} className="flex-1 sm:flex-none p-2 text-zinc-400 border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors">
+              <Download size={18} />
             </button>
           </div>
         </div>
       </div>
 
       {/* Content Area - RESPONSIVE TABLE FOR ALL DEVICES */}
-      <div className="flex-1 bg-zinc-950/30 overflow-y-auto overflow-x-auto custom-scrollbar w-full max-h-[calc(100vh-250px)] relative">
+      <div className="flex-1 bg-zinc-950/30 overflow-y-auto overflow-x-auto custom-scrollbar w-full max-h-[calc(100vh-320px)] relative">
          <table className="w-full text-left border-collapse text-sm">
            <thead className="sticky top-0 z-20 shadow-md shadow-black/20">
              <tr>
