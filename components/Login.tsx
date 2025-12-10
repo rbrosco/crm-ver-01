@@ -35,7 +35,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <LayoutGrid size={40} />
           </div>
           <h1 className="text-3xl font-bold text-zinc-100 tracking-tight text-center">
-            Bem-vindo ao <br />CRM<span className="text-primary-500">Pro</span>
+            Bem-vindo ao <br />TREK STAR <span className="text-primary-500">C</span>
           </h1>
           <p className="text-zinc-500 text-sm mt-3 text-center max-w-xs">
             Faça login para acessar o painel de gerenciamento.

@@ -155,7 +155,7 @@ const App: React.FC = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-zinc-100 tracking-tight">
-                CRM<span className="text-primary-500">Pro</span>
+                TREK STAR <span className="text-primary-500">C</span>
               </h1>
             </div>
           </div>
