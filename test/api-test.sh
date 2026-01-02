@@ -18,8 +18,8 @@ fi
 echo ""
 
 # Test 2: Login
-echo "2️⃣ Testando Login (admin/admin)..."
-login_response=$(wget --post-data='{"username":"admin","password":"admin"}' \
+echo "2️⃣ Testando Login (admin/cmldgs@2002025)..."
+login_response=$(wget --post-data='{"username":"admin","password":"cmldgs@2002025"}' \
     --header='Content-Type: application/json' \
     -qO- http://localhost:3001/api/auth/login 2>&1)
 

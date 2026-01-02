@@ -5,12 +5,24 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth';
 import clientRoutes from './routes/clients';
+import { pool } from './db';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const PORT_NUM = typeof PORT === 'string' ? parseInt(PORT, 10) : PORT;
+
+async function ensureArchivedSupport() {
+  try {
+    await pool.query(
+      'ALTER TABLE IF EXISTS "clients" ADD COLUMN IF NOT EXISTS "isArchived" boolean NOT NULL DEFAULT false;'
+    );
+  } catch (err) {
+    console.error('Failed to ensure isArchived column on clients:', err);
+  }
+}
 
 // Middleware
 app.use(cors());
@@ -45,11 +57,15 @@ app.use((req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
-  console.log(`📁 Serving static files from dist/`);
-  console.log(`🔌 API available at /api`);
-});
+(async () => {
+  await ensureArchivedSupport();
+
+  app.listen(PORT_NUM, '0.0.0.0', () => {
+    console.log(`🚀 Server running on http://0.0.0.0:${PORT_NUM}`);
+    console.log(`📁 Serving static files from dist/`);
+    console.log(`🔌 API available at /api`);
+  });
+})();
 
 // Graceful shutdown
 process.on('SIGINT', () => {

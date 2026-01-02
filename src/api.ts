@@ -29,6 +29,11 @@ export const authAPI = {
     const response = await api.post('/auth/login', { username, password });
     return response.data;
   }
+  ,
+  changePassword: async (currentPassword: string, newPassword: string) => {
+    const response = await api.post('/auth/change-password', { currentPassword, newPassword });
+    return response.data;
+  }
 };
 
 // Clients API
@@ -55,6 +60,11 @@ export const clientsAPI = {
 
   delete: async (id: string) => {
     const response = await api.delete(`/clients/${id}`);
+    return response.data;
+  },
+
+  unarchive: async (id: string) => {
+    const response = await api.patch(`/clients/${id}/unarchive`);
     return response.data;
   },
 

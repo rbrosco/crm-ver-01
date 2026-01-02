@@ -95,16 +95,49 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = await db.delete(clients).where(eq(clients.id, id)).returning();
+    // Soft delete: archive instead of removing from DB
+    const result = await db
+      .update(clients)
+      .set({
+        isArchived: true,
+        updatedAt: new Date(),
+      })
+      .where(eq(clients.id, id))
+      .returning();
 
     if (result.length === 0) {
       return res.status(404).json({ message: 'Cliente não encontrado' });
     }
 
-    res.json({ message: 'Cliente excluído com sucesso' });
+    res.json({ message: 'Cliente arquivado com sucesso', client: result[0] });
   } catch (error) {
     console.error('Delete client error:', error);
     res.status(500).json({ message: 'Erro ao excluir cliente' });
+  }
+});
+
+// Unarchive client
+router.patch('/:id/unarchive', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db
+      .update(clients)
+      .set({
+        isArchived: false,
+        updatedAt: new Date(),
+      })
+      .where(eq(clients.id, id))
+      .returning();
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'Cliente não encontrado' });
+    }
+
+    res.json({ message: 'Cliente restaurado com sucesso', client: result[0] });
+  } catch (error) {
+    console.error('Unarchive client error:', error);
+    res.status(500).json({ message: 'Erro ao restaurar cliente' });
   }
 });
 

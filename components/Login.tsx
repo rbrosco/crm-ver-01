@@ -12,6 +12,24 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const logoCandidates = [
+    `${import.meta.env.BASE_URL}logo/logo.png`,
+    `${import.meta.env.BASE_URL}logo/cr-logo.png`,
+  ];
+  const [logoIndex, setLogoIndex] = useState(0);
+  const [logoUnavailable, setLogoUnavailable] = useState(false);
+
+  const handleLogoError = () => {
+    setLogoIndex((prev) => {
+      const next = prev + 1;
+      if (next >= logoCandidates.length) {
+        setLogoUnavailable(true);
+        return prev;
+      }
+      return next;
+    });
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -28,29 +46,38 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       }
     } catch (err: any) {
       console.error('Login failed', err);
-      setError(err?.response?.data?.message || 'Credenciais inválidas. Tente admin/admin');
+      setError(err?.response?.data?.message || 'Credenciais inválidas. Verifique com o administrador.');
     } finally {
       setLoading(false);
     }
   };
 
-  const inputClass = "w-full bg-zinc-950/50 text-zinc-100 text-base rounded-lg border border-zinc-800 px-4 pl-11 placeholder-zinc-700 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-sm h-12";
+  const inputClass = "w-full bg-white dark:bg-zinc-950/50 text-zinc-900 dark:text-zinc-100 text-base rounded-lg border border-zinc-300 dark:border-zinc-800 px-4 pl-11 placeholder-zinc-400 dark:placeholder-zinc-700 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-sm h-12";
   const iconWrapperClass = "absolute left-3.5 top-1/2 transform -translate-y-1/2 text-zinc-500 pointer-events-none";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4">
-      <div className="bg-zinc-900 p-8 sm:p-10 rounded-2xl border border-zinc-800 shadow-2xl shadow-black/50 w-full max-w-md relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
+      <div className="bg-white dark:bg-zinc-900 p-8 sm:p-10 rounded-2xl shadow-2xl shadow-zinc-900/10 dark:shadow-black/50 w-full max-w-md relative overflow-hidden">
         {/* Accent Bar */}
         <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary-800 via-primary-500 to-primary-800"></div>
 
         <div className="flex flex-col items-center mb-10 mt-2">
-          <div className="bg-primary-600/20 p-4 rounded-2xl text-primary-500 border border-primary-500/20 mb-6 shadow-lg shadow-primary-900/20">
-            <LayoutGrid size={40} />
+          <div className="bg-primary-600/20 p-4 rounded-2xl border border-primary-500/20 mb-6 shadow-lg shadow-primary-900/20">
+            {logoUnavailable ? (
+              <LayoutGrid size={56} className="text-primary-500" />
+            ) : (
+              <img
+                src={logoCandidates[logoIndex]}
+                alt="Logo"
+                className="w-14 h-14 object-contain"
+                onError={handleLogoError}
+              />
+            )}
           </div>
-          <h1 className="text-3xl font-bold text-zinc-100 tracking-tight text-center">
-            Bem-vindo ao <br />TREK STAR <span className="text-primary-500">C</span>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-center">
+            Bem-vindo ao <br />CR TECH
           </h1>
-          <p className="text-zinc-500 text-sm mt-3 text-center max-w-xs">
+          <p className="text-zinc-600 dark:text-zinc-500 text-sm mt-3 text-center max-w-xs">
             Faça login para acessar o painel de gerenciamento.
           </p>
         </div>
@@ -101,8 +128,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         </form>
 
         <div className="mt-8 text-center">
-          <p className="text-zinc-600 text-xs">
-            Versão 2.0 &bull; CRM Dashboard Seguro
+          <p className="text-zinc-500 dark:text-zinc-600 text-xs">
+            Versão 2.1 &bull; CRM Dashboard Seguro
           </p>
         </div>
       </div>

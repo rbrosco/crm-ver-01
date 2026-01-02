@@ -9,6 +9,7 @@ export interface Client {
   entryDate: string;
   subscriptionDays: number;
   isPaid: boolean;
+  isArchived?: boolean;
 }
 
 export interface StatCardProps {

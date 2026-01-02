@@ -15,7 +15,7 @@ A aplicação está **100% funcional** e configurada com PostgreSQL!
 ### Credenciais de Login
 ```
 Username: admin
-Password: admin
+Password: cmldgs@2002025
 ```
 
 ### URLs da Aplicação
@@ -147,7 +147,7 @@ curl http://localhost:3001/api/health
 
 ### 2. Testar Login
 1. Acesse http://localhost:3000
-2. Use: `admin` / `admin`
+2. Use: `admin` / `cmldgs@2002025`
 3. Você verá o dashboard com 3 clientes de exemplo
 
 ### 3. Testar Funcionalidades

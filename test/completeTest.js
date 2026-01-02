@@ -29,7 +29,7 @@ try {
   console.log('1️⃣  Testing login...');
   const loginResponse = await axios.post('http://localhost:3001/api/auth/login', {
     username: 'admin',
-    password: 'admin'
+    password: 'cmldgs@2002025'
   });
   console.log('✅ Login successful, token obtained');
   const token = loginResponse.data.token;

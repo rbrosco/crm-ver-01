@@ -1,14 +1,17 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
-import { Search, Upload, Download, Trash2, Edit, ChevronUp, ChevronDown, Filter, Phone, Calendar, Globe, Wifi, X } from 'lucide-react';
+import { Search, Upload, Download, Trash2, Edit, ChevronUp, ChevronDown, Filter, Phone, Calendar, Globe, Wifi, X, Archive, RotateCcw } from 'lucide-react';
 import { Client } from '../types';
+import { clientsAPI } from '../src/api';
 
 interface ClientListProps {
   clients: Client[];
   onDelete: (id: string) => void;
   onEdit: (client: Client) => void;
   onImport: (clients: Client[]) => void;
-  activeFilter?: 'all' | '10' | '30' | 'pending';
+  activeFilter?: 'all' | '10' | '30' | 'pending' | 'inactive';
   onClearFilter?: () => void;
+  viewMode: 'active' | 'archived';
+  onToggleViewMode: () => void;
 }
 
 type SortDirection = 'asc' | 'desc';
@@ -35,11 +38,14 @@ export const ClientList: React.FC<ClientListProps> = ({
   onEdit, 
   onImport,
   activeFilter = 'all',
-  onClearFilter
+  onClearFilter,
+  viewMode,
+  onToggleViewMode
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
   const [filters, setFilters] = useState<Partial<Record<keyof Client, string>>>({});
+  const [unarchivingId, setUnarchivingId] = useState<string | null>(null);
   
   // Resizing State
   const [columnWidths, setColumnWidths] = useState(DEFAULT_WIDTHS);
@@ -125,22 +131,26 @@ export const ClientList: React.FC<ClientListProps> = ({
           return !client.isPaid;
         }
 
+        if (activeFilter === 'inactive') {
+          return (Number(client.subscriptionDays) || 0) <= 0;
+        }
+
         // Date Calculation for 10/30 days
         if (client.entryDate) {
           const parts = client.entryDate.split('-');
           if (parts.length === 3) {
             const entry = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            const totalDays = Number(client.subscriptionDays) || 0;
             const expiryDate = new Date(entry);
-            expiryDate.setDate(entry.getDate() + (Number(client.subscriptionDays) || 0));
+            expiryDate.setDate(entry.getDate() + totalDays);
 
             const diffTime = expiryDate.getTime() - today.getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
             if (activeFilter === '10') {
-              return diffDays >= 0 && diffDays <= 10;
+              return diffDays > 0 && diffDays <= 10;
             }
             if (activeFilter === '30') {
-              return diffDays >= 0 && diffDays <= 30;
+              return diffDays > 0 && diffDays <= 30;
             }
           }
         }
@@ -244,6 +254,23 @@ export const ClientList: React.FC<ClientListProps> = ({
     }
   };
 
+  const handleUnarchive = async (clientId: string) => {
+    try {
+      setUnarchivingId(clientId);
+      const result = await clientsAPI.unarchive(clientId);
+      if ((result as any)?.client?.id) {
+        const unarch = (result as any).client;
+        const updatedClient: Client = { ...unarch };
+        onEdit(updatedClient);
+      }
+    } catch (err) {
+      console.error('Erro ao restaurar cliente:', err);
+      alert('Erro ao restaurar cliente.');
+    } finally {
+      setUnarchivingId(null);
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -272,7 +299,7 @@ export const ClientList: React.FC<ClientListProps> = ({
     return (
       <th 
         key={fieldKey}
-        className={`px-1.5 py-0.5 text-left align-top bg-zinc-900 border-b border-zinc-800 relative select-none whitespace-nowrap ${visibilityClass}`}
+        className={`px-1.5 py-0.5 text-left align-top bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 relative select-none whitespace-nowrap ${visibilityClass}`}
         style={style}
       >
         <div className="flex flex-col gap-1.5">
@@ -280,10 +307,10 @@ export const ClientList: React.FC<ClientListProps> = ({
             className="flex items-center gap-0.5 cursor-pointer group"
             onClick={() => handleSort(fieldKey as keyof Client)}
           >
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider group-hover:text-primary-400 transition-colors whitespace-nowrap">
+            <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors whitespace-nowrap">
               {label}
             </span>
-            <div className="text-zinc-600 group-hover:text-primary-500">
+            <div className="text-zinc-500 dark:text-zinc-600 group-hover:text-primary-500">
               {sortConfig?.key === fieldKey ? (
                 sortConfig.direction === 'asc' ? <ChevronUp size={12} /> : <ChevronDown size={12} />
               ) : (
@@ -294,7 +321,7 @@ export const ClientList: React.FC<ClientListProps> = ({
           <div onClick={(e) => e.stopPropagation()}> 
             {isSelect ? (
               <select
-                className="w-full bg-zinc-950 border border-zinc-700 text-zinc-200 text-xs rounded px-1 py-0.5 focus:outline-none focus:border-primary-500 appearance-none cursor-pointer"
+                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-200 text-xs rounded px-1 py-0.5 focus:outline-none focus:border-primary-500 appearance-none cursor-pointer"
                 value={filters[fieldKey as keyof Client] || 'todos'}
                 onChange={(e) => handleFilterChange(fieldKey as keyof Client, e.target.value)}
               >
@@ -308,7 +335,7 @@ export const ClientList: React.FC<ClientListProps> = ({
                 type="text"
                 autoComplete="off"
                 placeholder="Filtrar..."
-                className="w-full bg-zinc-950 border border-zinc-700 text-zinc-200 text-xs rounded px-1 py-0.5 focus:outline-none focus:border-primary-500 placeholder-zinc-600"
+                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-200 text-xs rounded px-1 py-0.5 focus:outline-none focus:border-primary-500 placeholder-zinc-400 dark:placeholder-zinc-600"
                 value={filters[fieldKey as keyof Client] || ''}
                 onChange={(e) => handleFilterChange(fieldKey as keyof Client, e.target.value)}
               />
@@ -329,15 +356,24 @@ export const ClientList: React.FC<ClientListProps> = ({
       <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".csv" className="hidden" />
 
       {/* Header Bar */}
-      <div className="p-2 md:p-3 border-b border-zinc-800 flex flex-col xl:flex-row justify-between items-center gap-3 bg-zinc-900 shrink-0">
+      <div className="p-2 md:p-3 border-b border-zinc-200 dark:border-zinc-800 flex flex-col xl:flex-row justify-between items-center gap-3 bg-white dark:bg-zinc-900 shrink-0">
         <div className="flex items-center gap-3 w-full xl:w-auto justify-between xl:justify-start">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-bold text-zinc-100 tracking-tight">Clientes</h2>
-            <span className="bg-zinc-800 text-zinc-400 text-sm font-bold px-3 py-0.5 rounded-full border border-zinc-700">{processedClients.length}</span>
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
+              {viewMode === 'archived' ? 'Clientes Arquivados' : 'Clientes'}
+            </h2>
+            <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-sm font-bold px-3 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-700">{processedClients.length}</span>
             
             {activeFilter && activeFilter !== 'all' && (
               <div className="flex items-center gap-2 bg-primary-600/20 border border-primary-500/30 text-primary-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider animate-fadeIn">
-                 <span>Filtro: {activeFilter === 'pending' ? 'Pendentes' : `${activeFilter} Dias`}</span>
+                 <span>
+                   Filtro:{' '}
+                   {activeFilter === 'pending'
+                     ? 'Pendentes'
+                     : activeFilter === 'inactive'
+                     ? 'Não Ativos'
+                     : `${activeFilter} Dias`}
+                 </span>
                  <button onClick={onClearFilter} className="hover:text-white transition-colors">
                    <X size={14} />
                  </button>
@@ -353,16 +389,26 @@ export const ClientList: React.FC<ClientListProps> = ({
               type="search" 
               autoComplete="off"
               placeholder="Pesquisar..." 
-              className="w-full xl:w-64 bg-zinc-950 border border-zinc-700 text-zinc-100 text-sm rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all placeholder-zinc-600 shadow-inner"
+              className="w-full xl:w-64 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-sm rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all placeholder-zinc-400 dark:placeholder-zinc-600 shadow-inner"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-            <button onClick={handleImportClick} className="flex-1 sm:flex-none p-2 text-zinc-400 border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors">
+            <button
+              onClick={onToggleViewMode}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white rounded-lg transition-colors"
+              title={viewMode === 'archived' ? 'Ver clientes ativos' : 'Ver clientes arquivados'}
+            >
+              <Archive size={18} />
+              <span className="hidden sm:inline text-sm font-medium">
+                {viewMode === 'archived' ? 'Ativos' : 'Arquivados'}
+              </span>
+            </button>
+            <button onClick={handleImportClick} className="flex-1 sm:flex-none p-2 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white rounded-lg transition-colors">
               <Upload size={18} />
             </button>
-            <button onClick={handleExport} className="flex-1 sm:flex-none p-2 text-zinc-400 border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors">
+            <button onClick={handleExport} className="flex-1 sm:flex-none p-2 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white rounded-lg transition-colors">
               <Download size={18} />
             </button>
           </div>
@@ -370,9 +416,9 @@ export const ClientList: React.FC<ClientListProps> = ({
       </div>
 
       {/* Content Area - RESPONSIVE TABLE FOR ALL DEVICES */}
-      <div className="flex-1 bg-zinc-950/30 overflow-y-auto overflow-x-auto custom-scrollbar w-full max-h-[calc(100vh-320px)] relative">
+      <div className="flex-1 bg-zinc-50 dark:bg-zinc-950/30 overflow-y-auto overflow-x-auto custom-scrollbar w-full max-h-[calc(100vh-320px)] relative">
          <table className="w-full text-left border-collapse text-sm">
-           <thead className="sticky top-0 z-20 shadow-md shadow-black/20">
+           <thead className="sticky top-0 z-20 shadow-md shadow-zinc-900/10 dark:shadow-black/20">
              <tr>
                {renderHeader("Nome Completo", "fullName")}
                {renderHeader("Telefone", "phone")}
@@ -380,22 +426,23 @@ export const ClientList: React.FC<ClientListProps> = ({
                {renderHeader("MAC Address", "macAddress", false, true)} {/* Hide on Mobile */}
                {renderHeader("Data Início", "entryDate", false, true)} {/* Hide on Mobile */}
                {renderHeader("Duração", "subscriptionDays", false, true)} {/* Hide on Mobile */}
+               {renderHeader("Dias Restantes", "daysRemaining", false, false)} {/* Show remaining days */}
                {renderHeader("Status", "isPaid", true)}
-               <th className="px-1.5 py-0.5 bg-zinc-900 border-b border-zinc-800 w-[70px] text-xs">Ações</th>
+               <th className="px-1.5 py-0.5 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 w-[70px] text-xs">Ações</th>
              </tr>
            </thead>
            <tbody>
              {processedClients.length === 0 ? (
-               <tr><td colSpan={8} className="text-center py-10 text-zinc-500">Nenhum cliente encontrado.</td></tr>
+               <tr><td colSpan={8} className="text-center py-10 text-zinc-600 dark:text-zinc-500">Nenhum cliente encontrado.</td></tr>
              ) : (
                processedClients.map(client => {
                  const cleanPhone = client.phone ? client.phone.replace(/\D/g, '') : '';
                  return (
-                  <tr key={client.id} className="hover:bg-zinc-800/30 transition-colors group">
-                      <td className="px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-100 font-medium text-sm whitespace-nowrap">
+                  <tr key={client.id} className="hover:bg-zinc-100 dark:hover:bg-zinc-800/30 transition-colors group">
+                      <td className="px-1.5 py-0.5 border-b border-zinc-200 dark:border-zinc-800/50 text-zinc-900 dark:text-zinc-100 font-medium text-sm whitespace-nowrap">
                         {client.fullName}
                       </td>
-                      <td className="px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-300 text-sm whitespace-nowrap">
+                      <td className="px-1.5 py-0.5 border-b border-zinc-200 dark:border-zinc-800/50 text-zinc-700 dark:text-zinc-300 text-sm whitespace-nowrap">
                          {cleanPhone ? (
                            <a href={`https://wa.me/${cleanPhone}`} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 flex items-center gap-0.5 transition-colors">
                               <Phone size={12} />
@@ -405,24 +452,48 @@ export const ClientList: React.FC<ClientListProps> = ({
                             client.phone || '-'
                          )}
                       </td>
-                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-400 text-xs whitespace-nowrap">
+                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-200 dark:border-zinc-800/50 text-zinc-600 dark:text-zinc-400 text-xs whitespace-nowrap">
                         <span className="flex items-center gap-1">
-                          <Globe size={12} className="text-zinc-600" />
+                          <Globe size={12} className="text-zinc-500 dark:text-zinc-600" />
                           {client.country}
                         </span>
                       </td>
-                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-800/50 whitespace-nowrap">
-                        <span className="font-mono text-xs bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded text-zinc-400 select-all">
+                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-200 dark:border-zinc-800/50 whitespace-nowrap">
+                        <span className="font-mono text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-1.5 py-0.5 rounded text-zinc-600 dark:text-zinc-400 select-all">
                             {client.macAddress || '---'}
                         </span>
                       </td>
-                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-400 text-xs whitespace-nowrap">
+                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-200 dark:border-zinc-800/50 text-zinc-600 dark:text-zinc-400 text-xs whitespace-nowrap">
                          {new Date(client.entryDate).toLocaleDateString('pt-BR')}
                       </td>
-                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-800/50 text-zinc-400 text-xs whitespace-nowrap">
+                      <td className="hidden md:table-cell px-1.5 py-0.5 border-b border-zinc-200 dark:border-zinc-800/50 text-zinc-600 dark:text-zinc-400 text-xs whitespace-nowrap">
                          {client.subscriptionDays} dias
                       </td>
-                      <td className="px-1.5 py-0.5 border-b border-zinc-800/50 whitespace-nowrap">
+                      <td className="px-1.5 py-0.5 border-b border-zinc-200 dark:border-zinc-800/50 text-zinc-600 dark:text-zinc-400 text-xs whitespace-nowrap">
+                         {(() => {
+                           const today = new Date();
+                           today.setHours(0, 0, 0, 0);
+                           const parts = client.entryDate.split('-');
+                           if (parts.length === 3) {
+                             const entry = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                             // Dias restantes = duração - (hoje - data início), nunca maior que duração
+                             const diffTime = today.getTime() - entry.getTime();
+                             const elapsedDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                             const totalDays = Number(client.subscriptionDays) || 0;
+                             let remainingDays = totalDays - elapsedDays;
+                             if (remainingDays > totalDays) remainingDays = totalDays;
+                             const isExpired = remainingDays <= 0;
+                             const isExpiringSoon = remainingDays > 0 && remainingDays <= 10;
+                             return (
+                               <span className={`font-semibold ${isExpired ? 'text-red-500' : isExpiringSoon ? 'text-amber-500' : 'text-green-500'}`}>
+                                 {isExpired ? `Vencido há ${Math.abs(remainingDays)} dias` : `${remainingDays} dias`}
+                               </span>
+                             );
+                           }
+                           return '-';
+                         })()}
+                      </td>
+                      <td className="px-1.5 py-0.5 border-b border-zinc-200 dark:border-zinc-800/50 whitespace-nowrap">
                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wide ${
                             client.subscriptionDays <= 0
                               ? 'bg-red-500/10 text-red-400 border-red-500/20'
@@ -433,22 +504,35 @@ export const ClientList: React.FC<ClientListProps> = ({
                             {client.subscriptionDays <= 0 ? 'Não Ativo' : client.isPaid ? 'Ativo' : 'Pendente'}
                          </span>
                       </td>
-                      <td className="px-1.5 py-0.5 border-b border-zinc-800/50 sticky right-0 bg-zinc-950/80 backdrop-blur-sm group-hover:bg-zinc-900/80 transition-colors z-10 whitespace-nowrap">
+                      <td className="px-1.5 py-0.5 border-b border-zinc-200 dark:border-zinc-800/50 sticky right-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm group-hover:bg-zinc-100/80 dark:group-hover:bg-zinc-900/80 transition-colors z-10 whitespace-nowrap">
                          <div className="flex gap-1">
-                            <button 
-                              onClick={() => onEdit(client)}
-                              className="p-1 text-zinc-500 hover:text-primary-400 hover:bg-zinc-800 rounded transition-colors"
-                              title="Editar"
-                            >
-                              <Edit size={14} />
-                            </button>
-                            <button 
-                              onClick={() => onDelete(client.id)}
-                              className="p-1 text-zinc-500 hover:text-red-400 hover:bg-zinc-800 rounded transition-colors"
-                              title="Excluir"
-                            >
-                              <Trash2 size={14} />
-                            </button>
+                            {viewMode === 'archived' ? (
+                              <button 
+                                onClick={() => handleUnarchive(client.id)}
+                                disabled={unarchivingId === client.id}
+                                className="p-1 text-zinc-600 dark:text-zinc-500 hover:text-green-500 dark:hover:text-green-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded transition-colors disabled:opacity-50"
+                                title="Restaurar"
+                              >
+                                <RotateCcw size={14} />
+                              </button>
+                            ) : (
+                              <>
+                                <button 
+                                  onClick={() => onEdit(client)}
+                                  className="p-1 text-zinc-600 dark:text-zinc-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded transition-colors"
+                                  title="Editar"
+                                >
+                                  <Edit size={14} />
+                                </button>
+                                <button 
+                                  onClick={() => onDelete(client.id)}
+                                  className="p-1 text-zinc-600 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded transition-colors"
+                                  title="Arquivar"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </>
+                            )}
                          </div>
                       </td>
                   </tr>

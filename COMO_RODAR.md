@@ -1,4 +1,4 @@
-# 🚀 Como Rodar o CRM TREK STAR C
+# 🚀 Como Rodar o CRM DASHBOARD
 
 ## 📋 Pré-requisitos
 
@@ -44,16 +44,11 @@ psql "$DATABASE_URL" -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
 
 ### 4. Criar Tabelas (Migrations)
 
-Execute as migrations do Drizzle:
-
 ```bash
 npm run db:push
 ```
 
 Ou aplique manualmente o SQL em `drizzle/0000_vengeful_blazing_skull.sql`:
-
-```bash
-source .env
 psql "$DATABASE_URL" < drizzle/0000_vengeful_blazing_skull.sql
 ```
 
@@ -139,32 +134,18 @@ pm2 logs
 ```bash
 # Rebuild frontend
 npm run build
-
-# Recarregar processos
 pm2 reload all --update-env
 ```
 
 **6. Configurar PM2 para iniciar no boot:**
-```bash
-pm2 save
-pm2 startup
 ```
-
-## 🧪 Executando Testes
 
 ### Teste de Conexão com Banco
 ```bash
 node test/testConnection.js
 ```
-
 ### Teste de Criação de Cliente
 ```bash
-node test/createClientTest.js
-```
-
-### Teste Completo (Login + Criação + Verificação DB)
-```bash
-node test/completeTest.js
 ```
 
 ## 🔑 Credenciais Padrão
@@ -257,12 +238,6 @@ pm2 monit
 ```bash
 source .env
 psql "$DATABASE_URL" -c "ALTER TABLE \"User\" ALTER COLUMN id SET DEFAULT gen_random_uuid();"
-psql "$DATABASE_URL" -c "ALTER TABLE \"Client\" ALTER COLUMN id SET DEFAULT gen_random_uuid();"
-```
-
-### Frontend não carrega ou mostra página em branco
-
-**Solução:**
 1. Limpe cache do navegador (Ctrl+Shift+Del)
 2. Rebuild o frontend:
    ```bash

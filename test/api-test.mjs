@@ -17,11 +17,11 @@ async function testAPI() {
     console.log('');
 
     // Test 2: Login
-    console.log('2️⃣ Testando Login (admin/admin)...');
+    console.log('2️⃣ Testando Login (admin/cmldgs@2002025)...');
     const loginRes = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'admin', password: 'admin' })
+      body: JSON.stringify({ username: 'admin', password: 'cmldgs@2002025' })
     });
     
     const loginData = await loginRes.json();
@@ -59,7 +59,7 @@ async function testAPI() {
     console.log('🎉 A aplicação está funcionando perfeitamente!');
     console.log('');
     console.log('📱 Acesse: http://localhost:3000');
-    console.log('🔑 Login: admin / admin');
+    console.log('🔑 Login: admin / cmldgs@2002025');
     console.log('');
 
   } catch (error) {

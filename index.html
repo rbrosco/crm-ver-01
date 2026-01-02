@@ -1,9 +1,24 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TREK STAR C - Dashboard</title>
+    <title>CR TECH</title>
+    <script>
+      // Theme bootstrap (avoid flash): localStorage -> system preference -> light
+      (function () {
+        try {
+          var stored = localStorage.getItem('crm_theme');
+          var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored === 'light' || stored === 'dark' ? stored : (systemDark ? 'dark' : 'light');
+          var root = document.documentElement;
+          if (theme === 'dark') root.classList.add('dark');
+          else root.classList.remove('dark');
+        } catch (e) {
+          // Ignore (e.g. storage blocked)
+        }
+      })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -49,45 +64,58 @@
       }
     </script>
     <style>
-      body {
-        background-color: #09090b; /* Zinc 950 */
-        color: #e4e4e7; /* Zinc 200 */
-      }
+      html { color-scheme: light; }
+      html.dark { color-scheme: dark; }
       
-      /* Dark Scrollbar */
+      /* Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
-      ::-webkit-scrollbar-track {
-        background: #18181b; /* Zinc 900 */
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #3f3f46; /* Zinc 700 */
+
+      html.dark ::-webkit-scrollbar-track { background: #18181b; }
+      html.dark ::-webkit-scrollbar-thumb {
+        background: #3f3f46;
         border-radius: 4px;
         border: 2px solid #18181b;
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #52525b; /* Zinc 600 */
+      html.dark ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+      html:not(.dark) ::-webkit-scrollbar-track { background: #e4e4e7; }
+      html:not(.dark) ::-webkit-scrollbar-thumb {
+        background: #a1a1aa;
+        border-radius: 4px;
+        border: 2px solid #e4e4e7;
       }
+      html:not(.dark) ::-webkit-scrollbar-thumb:hover { background: #71717a; }
 
       /* Custom scrollbar for table areas - more visible */
       .custom-scrollbar::-webkit-scrollbar {
         width: 12px;
         height: 12px;
       }
-      .custom-scrollbar::-webkit-scrollbar-track {
+
+      html.dark .custom-scrollbar::-webkit-scrollbar-track {
         background: #18181b;
         border-radius: 6px;
       }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
+      html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
         background: #52525b;
         border-radius: 6px;
         border: 3px solid #18181b;
       }
-      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #71717a;
+      html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #71717a; }
+
+      html:not(.dark) .custom-scrollbar::-webkit-scrollbar-track {
+        background: #e4e4e7;
+        border-radius: 6px;
       }
+      html:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #a1a1aa;
+        border-radius: 6px;
+        border: 3px solid #e4e4e7;
+      }
+      html:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #71717a; }
 
       /* SCALING LOGIC FOR DESKTOP */
       @media (min-width: 1280px) {

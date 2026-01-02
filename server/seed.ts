@@ -2,22 +2,36 @@ import 'dotenv/config';
 import { db } from './db';
 import { users, clients } from './schema';
 import bcrypt from 'bcrypt';
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 
 async function seed() {
   console.log('🌱 Iniciando seed do banco de dados...\n');
 
   try {
     // Create admin user
-    const hashedPassword = await bcrypt.hash('admin', 10);
-    
+    const adminPlain = process.env.ADMIN_PASSWORD || crypto.randomBytes(24).toString('hex');
+
+    const hashedPassword = await bcrypt.hash(adminPlain, 10);
+
     await db.insert(users).values({
       username: 'admin',
       password: hashedPassword,
     }).onConflictDoNothing();
 
-    console.log('✅ Usuário admin criado/atualizado:');
-    console.log('   Username: admin');
-    console.log('   Password: admin\n');
+    if (process.env.ADMIN_PASSWORD) {
+      console.log('✅ Usuário admin criado/atualizado a partir de ADMIN_PASSWORD (senha não exibida).');
+    } else {
+      // Save generated password locally with restricted permissions so it's not shown to clients
+      const filePath = path.join(process.cwd(), '.admin_password');
+      try {
+        fs.writeFileSync(filePath, adminPlain, { mode: 0o600 });
+        console.log(`✅ Usuário admin criado/atualizado (senha gerada e gravada em ${filePath})`);
+      } catch (e) {
+        console.log('✅ Usuário admin criado/atualizado (senha gerada). Falha ao gravar .admin_password:', e);
+      }
+    }
 
     // Create some sample clients
     const sampleClients = [
@@ -54,9 +68,7 @@ async function seed() {
 
     console.log(`✅ ${sampleClients.length} clientes de exemplo criados\n`);
     console.log('🎉 Seed concluído com sucesso!');
-    console.log('\n🚀 Você pode fazer login com:');
-    console.log('   Username: admin');
-    console.log('   Password: admin\n');
+    console.log('\n🚀 Admin criado. Senha não será exibida publicamente.');
 
   } catch (error) {
     console.error('❌ Erro durante o seed:', error);

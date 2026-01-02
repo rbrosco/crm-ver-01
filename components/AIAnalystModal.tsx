@@ -109,17 +109,17 @@ export const AIAnalystModal: React.FC<AIAnalystModalProps> = ({ isOpen, onClose,
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-zinc-900 w-full max-w-2xl h-[80vh] rounded-2xl border border-zinc-700 shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
+      <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl h-[80vh] rounded-2xl border border-zinc-200 dark:border-zinc-700 shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
         
         {/* Header */}
-        <div className="p-4 border-b border-zinc-800 bg-zinc-900 flex justify-between items-center">
+        <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-lg">
               <Bot className="text-white" size={24} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-zinc-100">Analista CRMPro</h3>
-              <p className="text-xs text-zinc-400 flex items-center gap-1">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Analista CRMPro</h3>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 flex items-center gap-1">
                 <Sparkles size={10} className="text-indigo-400" />
                 Powered by Gemini 2.5
               </p>
@@ -127,14 +127,14 @@ export const AIAnalystModal: React.FC<AIAnalystModalProps> = ({ isOpen, onClose,
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-zinc-800 rounded-full text-zinc-400 hover:text-white transition-colors"
+            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-zinc-950/50">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-zinc-50 dark:bg-zinc-950/50">
           {messages.map((msg, idx) => (
             <div 
               key={idx} 
@@ -143,8 +143,8 @@ export const AIAnalystModal: React.FC<AIAnalystModalProps> = ({ isOpen, onClose,
               <div 
                 className={`max-w-[85%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed whitespace-pre-wrap shadow-md ${
                   msg.role === 'user' 
-                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 rounded-tr-none' 
-                    : 'bg-indigo-600/10 text-indigo-100 border border-indigo-500/20 rounded-tl-none'
+                    ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-tr-none' 
+                    : 'bg-indigo-600/10 text-indigo-900 dark:text-indigo-100 border border-indigo-500/20 rounded-tl-none'
                 }`}
               >
                 {msg.text}
@@ -153,9 +153,9 @@ export const AIAnalystModal: React.FC<AIAnalystModalProps> = ({ isOpen, onClose,
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3 flex items-center gap-2">
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-4 py-3 flex items-center gap-2">
                 <Loader2 size={16} className="animate-spin text-indigo-500" />
-                <span className="text-xs text-zinc-400">Analisando dados...</span>
+                <span className="text-xs text-zinc-600 dark:text-zinc-400">Analisando dados...</span>
               </div>
             </div>
           )}
@@ -163,7 +163,7 @@ export const AIAnalystModal: React.FC<AIAnalystModalProps> = ({ isOpen, onClose,
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-zinc-900 border-t border-zinc-800">
+        <div className="p-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800">
           <div className="relative flex items-center gap-2">
             <input
               type="text"
@@ -171,7 +171,7 @@ export const AIAnalystModal: React.FC<AIAnalystModalProps> = ({ isOpen, onClose,
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Pergunte sobre vencimentos, receitas ou peça um resumo..."
-              className="flex-1 bg-zinc-950 border border-zinc-700 text-zinc-100 rounded-xl px-4 py-3.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder-zinc-600"
+              className="flex-1 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 rounded-xl px-4 py-3.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder-zinc-400 dark:placeholder-zinc-600"
             />
             <button 
               onClick={handleSend}
@@ -181,7 +181,7 @@ export const AIAnalystModal: React.FC<AIAnalystModalProps> = ({ isOpen, onClose,
               <Send size={20} />
             </button>
           </div>
-          <p className="text-center text-[10px] text-zinc-600 mt-2">
+          <p className="text-center text-[10px] text-zinc-500 dark:text-zinc-600 mt-2">
             A IA analisa apenas os dados visíveis atualmente no painel.
           </p>
         </div>

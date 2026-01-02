@@ -154,5 +154,5 @@ O arquivo `vite.config.ts` foi atualizado para passar as variáveis de ambiente 
 ## 📝 Notas
 
 - O sistema mantém compatibilidade com localStorage como fallback
-- A API usa autenticação básica (admin/admin) - expanda conforme necessário
+- A API usa autenticação inicial (admin/cmldgs@2002025) - expanda conforme necessário
 - Índices criados para otimizar queries de vencimento e status de pagamento

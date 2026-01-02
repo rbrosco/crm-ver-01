@@ -5,7 +5,7 @@ import axios from 'axios';
     // Primeiro, fazer login para obter o token
     const loginResponse = await axios.post('http://localhost:3001/api/auth/login', {
       username: 'admin',
-      password: 'admin'
+      password: 'cmldgs@2002025'
     });
 
     const token = loginResponse.data.token;
