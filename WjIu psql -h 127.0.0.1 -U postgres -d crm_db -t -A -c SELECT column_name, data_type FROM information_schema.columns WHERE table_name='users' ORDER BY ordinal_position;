@@ -1,0 +1,12 @@
+                               Table "public.users"
+  Column   |           Type           | Collation | Nullable |      Default       
+-----------+--------------------------+-----------+----------+--------------------
+ id        | uuid                     |           | not null | uuid_generate_v4()
+ username  | text                     |           | not null | 
+ password  | text                     |           | not null | 
+ createdAt | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updatedAt | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_username_key" UNIQUE CONSTRAINT, btree (username)
+
